@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/findItFast.css"
+    </head>
+    <body>
+        <p>Multiple search inputs of same type with same configurations, acting independently</p>
+        <div class="autoSearch" style="display: inline-block"></div>
+        <div class="autoSearch" style="display: inline-block"></div>
+
+        <p>Individual search inputs of same type with different configurations</p>
+        <div id="search1" class="autoSearch2" style="display: inline-block"></div>
+        <div id="search2" class="autoSearch2" style="display: inline-block"></div>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+        <script src="data/countries-json.js"></script>
+        <script src="data/countries-array.js"></script>
+        <script src="js/jquery.finditfast.js"> </script>
+        <script>
+            $('.autoSearch').findItFast({
+                dataConfig: {
+                    type: 'array',
+                    src: countriesARRAY,
+                    maxItems: 7
+                },
+                templates: {
+                    form: {
+                        default: {
+                            label: 'Find It Fast'
+                        }
+                    },
+                    listItems: {
+    					type: 'array'
+    				}
+                }
+            })
+
+            $('#search1').findItFast({
+                dataConfig: {
+                    type: 'json',
+                    src: countriesJSON,
+                    valueName: 'name'
+                },
+                templates: {
+                    form: {
+                        default: {
+                            label: 'Search by country name'
+                        }
+                    }
+                },
+                ariaConfig: {
+                    includeLiveRegion: true
+                }
+            })
+            $('#search2').findItFast({
+                dataConfig: {
+                    type: 'json',
+                    src: countriesJSON,
+                    valueName: 'code',
+                    maxItems: 5
+                },
+                templates: {
+                    form: {
+                        default: {
+                            label: 'Search by country code'
+                        }
+                    }
+                },
+                ariaConfig: {
+                    includeLiveRegion: true
+                }
+            })
+        </script>
+    </body>
+</html>

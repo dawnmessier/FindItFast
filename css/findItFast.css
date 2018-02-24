@@ -1,0 +1,107 @@
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0
+}
+
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto
+}
+
+.autoSearch,
+.autoSearch2 {
+    width: 500px;
+    position: relative;
+}
+
+.findItFast-list {
+    display: none;
+    background-color: #eee;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 5px 5px 5px #666;
+    position: absolute;
+    top: 44px;
+    left: 70px;
+    z-index: 9999;
+}
+
+.findItFast-list ul,
+.findItFast-list ul li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.findItFast-list li:hover {
+    color: blue;
+}
+
+.findItFast-list li:focus,
+.findItFast-list li:active {
+    
+}
+
+.findItFast-list .current {
+    background-color: #000;
+    color: #fff;
+}
+
+.findItFast-list .current:hover,
+.findItFast-list .current:focus,
+.findItFast-list .current:active {
+    color: yellow;
+}
+
+.findItFast-list ul li {
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.findItFast-input-span {
+    position: relative;
+    width: 300px;
+    display: inline-block;
+}
+
+.findItFast-input-span input {
+    width: 100%;
+    height: 44px;
+    position: relative;
+    border-radius: 5px;
+    padding: 0 10px;
+    -webkit-appearance: none; /* needed for search-typed inputs */
+}
+
+.findItFast-clear {
+    position: absolute;
+    display: inline-block;
+    visibility: visible;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    color: #999;
+    right: 2px;
+    top: 2px;
+    background: #fff;
+    border: none;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+}
+
+.findItFast-clear:hover,
+.findItFast-clear:focus,
+.findItFast-clear:active {
+    color: #000
+}
