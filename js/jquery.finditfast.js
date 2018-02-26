@@ -25,6 +25,7 @@
                 type: 'json', /* 'json' object, single 'array', or ajax 'url' */
                 src: null,
                 valueName: null,
+				valueHref: null,
 				maxItems: null,
 	            timer: 500
             },
@@ -37,14 +38,16 @@
 		                name: 'findItFast-form',
 		                label: 'Search',
 		                placeholder: '',
-		                inputName: 'findItFast-input',
-		                clearSearchText: 'Clear search',
+		                inputName: 'q',
+						inputClass: 'findItFast-input',
+		                clearSearchText: 'Clear search'
 					},
 					custom: null /*pass function to generate dom object*/
 	            },
 				listItems: {
 					type: 'json', /* 'json', 'array', 'custom' */
 					includeLinks: false,
+					className: 'findItFast-item',
 					custom: null /*pass function to generate dom array*/
 				}
             },
@@ -95,12 +98,12 @@
 					},
 					onObjBlur: function(e, obj){}
 				},
-				list: {
-					onObjFocus: function(e, obj){},
-					onObjBlur: function(e, obj){
-						autocomplete.cancel(obj)
-					}
-				},
+				// list: {
+				// 	onObjFocus: function(e, obj){},
+				// 	onObjBlur: function(e, obj){
+				// 		autocomplete.cancel(obj)
+				// 	}
+				// },
 				listItems: {
 					onObjClick: function(e, obj){
 						autocomplete.populateValue(e, obj)
@@ -113,14 +116,14 @@
 					onObjKeydown: function(e, obj){
 						switch (e.which) {
 						case keyCodes.ESCAPE:
-							obj.find('input[type="search"]').focus()
+							obj.find('.' + opts.templates.form.default.inputClass).focus()
 							return autocomplete.cancel(obj)
 						case keyCodes.UP:
 						case keyCodes.DOWN:
 							return autocomplete.changeSelection(obj, e.which === keyCodes.UP ? -1 : 1)
 						case keyCodes.ENTER:
 							$(this).trigger('click')
-							obj.find('input[type="search"]').focus()
+							obj.find('.' + opts.templates.form.default.inputClass).focus()
 							return autocomplete.cancel(obj)
 						default:
 							return false
@@ -158,11 +161,6 @@
 		// 	}
 		// });
 
-		var CONSTANTS = {
-			itemName: 'findItFast-item',
-			itemList: 'findItFast-list'
-		}
-
         var keyCodes = {
             ENTER: 13,
             UP: 38,
@@ -178,13 +176,30 @@
 		/*****************************************/
 		/* PRIVATE FUNCTIONS */
 		/*****************************************/
-        var delay = (function(){
+		var CONSTANTS = {
+			itemList: 'findItFast-list',
+			inputClass: 'findItFast-input'
+		}
+
+		var delay = (function(){
           var timer = 0;
           return function(callback, ms){
             clearTimeout (timer);
             timer = setTimeout(callback, ms);
           };
         })();
+
+		if (!String.format) {
+		  String.format = function(format) {
+		    var args = Array.prototype.slice.call(arguments, 1);
+		    return format.replace(/{(\d+)}/g, function(match, number) {
+		      return typeof args[number] != 'undefined'
+		        ? args[number]
+		        : match
+		      ;
+		    });
+		  };
+		}
 
 		var templates = {
 			form: {
@@ -203,6 +218,7 @@
 		                'type': 'search',
 		                'id': opts.templates.form.default.inputName + index,
 		                'name': opts.templates.form.default.inputName,
+						'class': CONSTANTS.inputClass,
 		                'role': 'combobox',
 		                'autocomplete': 'off',
 		                'aria-autocomplete': 'list',
@@ -211,12 +227,7 @@
 		                'aria-activedescendant': 'false',
 		                'placeholder': opts.templates.form.default.placeholder
 		            })
-		            .on('keydown', function(e){
-						opts.eventConfig.input.onObjKeydown(e, obj)
-	                })
-	                .on('focus', function(e){
-						opts.eventConfig.input.onObjFocus(e, obj)
-	                })
+					.addClass(opts.templates.form.default.inputClass)
 
 		            var inputSpan = $('<span></span>')
 		            .addClass('findItFast-input-span')
@@ -231,11 +242,6 @@
 		            .addClass('findItFast-clear')
 		            .text('X')
 		            .append(clearSpan)
-	                .on('click', function(e){
-						opts.eventConfig.cancel.onObjClick(e, obj)
-	                }).on('focus', function(e){
-	                    opts.eventConfig.cancel.onObjFocus(e, obj)
-	                })
 
 		            inputSpan.append(clearBtn)
 
@@ -255,68 +261,88 @@
 
 		            form.append(listContainer)
 
-					form.on('submit', function(e, obj){
-						opts.eventConfig.form.onObjSubmit(e, obj)
-					})
-
 					return form
 				},
-				custom: opts.templates.form.custom
+				custom: opts.templates.form.custom,
+				attachEvents: {
+					form: function(obj) {
+						var formToAttach = obj.find('form')
+
+						formToAttach.on('submit', function(e, obj){
+							opts.eventConfig.form.onObjSubmit(e, obj)
+						})
+					},
+					input: function(obj){
+						var inputToAttach = obj.find('.' + opts.templates.form.default.inputClass)
+
+						inputToAttach.on('keydown', function(e){
+							opts.eventConfig.input.onObjKeydown(e, obj)
+		                })
+		                .on('focus', function(e){
+							opts.eventConfig.input.onObjFocus(e, obj)
+		                })
+					},
+					cancel: function(obj){
+						var cancelToAttach = obj.find('button[type="reset"]')
+
+						cancelToAttach.on('click', function(e){
+							opts.eventConfig.cancel.onObjClick(e, obj)
+		                })
+						.on('focus', function(e){
+		                    opts.eventConfig.cancel.onObjFocus(e, obj)
+		                })
+					}
+				}
 			},
 			listItems: {
-				array: function(list, obj){
+				type: {
+					list: function(){
+						return '<li id="'+ opts.templates.listItems.className +'{1}" class="'+ opts.templates.listItems.className +'" role="option" aria-selected="false" tabindex="0">{0}</li>'
+					},
+					links: function(){
+						return '<li><a href="{2}" id="'+ opts.templates.listItems.className +'{1}" class="'+ opts.templates.listItems.className +'" role="option" aria-selected="false">{0}</a></li>'
+					}
+				},
+				attachEvents: function(obj, className){
+					var classToAttach = '.' + className
+
+					obj.on('click', classToAttach, function(e){
+						opts.eventConfig.listItems.onObjClick(e, obj)
+					})
+					.on('focus', classToAttach, function(e){
+						opts.eventConfig.listItems.onObjFocus(e, obj)
+					})
+					.on('keydown', classToAttach, function(e){
+						opts.eventConfig.listItems.onObjKeydown(e, obj)
+					})
+				},
+				processArray: function(list, obj){
 					var finalList = []
 					for(var i=0; i < list.length; i++){
-						var listLI = $('<li></li>')
-						.attr({
-							 'role': 'option',
-							 'aria-selected': false,
-							 'id': CONSTANTS.itemName + i,
-							 'tabindex': '0'
-						})
-						.text(list[i])
-						.on('click', function(e){
-							opts.eventConfig.listItems.onObjClick(e, obj)
-						})
-						.on('focus', function(e){
-							opts.eventConfig.listItems.onObjFocus(e, obj)
-						})
-						.on('keydown', function(e){
-							opts.eventConfig.listItems.onObjKeydown(e, obj)
-						})
+						var listLI = $(String.format(templates.listItems.type.list(), list[i], i))
 
 						finalList.push(listLI)
 					}
 
 					return finalList
 				},
-				json: function(list, obj){
+				processJson: function(list, obj){
 					var finalList = []
 					$.each(list, function(key, value){
-						var listLI = $('<li></li>')
-						.attr({
-							 'role': 'option',
-							 'aria-selected': false,
-							 'id': CONSTANTS.itemName + key,
-							 'tabindex': '0'
-						})
-						.text(value[opts.dataConfig.valueName])
-						.on('click', function(e){
-							opts.eventConfig.listItems.onObjClick(e, obj)
-						})
-						.on('focus', function(e){
-							opts.eventConfig.listItems.onObjFocus(e, obj)
-						})
-						.on('keydown', function(e){
-							opts.eventConfig.listItems.onObjKeydown(e, obj)
-						})
+						var listLI
+
+						if(opts.templates.listItems.includeLinks) {
+							listLI = $(String.format(templates.listItems.type.links(), value[opts.dataConfig.valueName], key, value[opts.dataConfig.valueHref]))
+						} else {
+							listLI = $(String.format(templates.listItems.type.list(), value[opts.dataConfig.valueName], key))
+						}
 
 						finalList.push(listLI)
 					})
 
 					return finalList
 				},
-				custom: opts.templates.listItems.custom
+				processCustom: opts.templates.listItems.custom
 			}
 		}
 
@@ -336,24 +362,24 @@
 	            } else {
 					switch(opts.templates.listItems.type){
 						case 'json':
-							listUL.append(templates.listItems.json(list, obj))
+							listUL.append(templates.listItems.processJson(list, obj))
 							break;
 						case 'array':
-							listUL.append(templates.listItems.array(list, obj))
+							listUL.append(templates.listItems.processArray(list, obj))
 							break;
 						case 'custom':
-							listUL.append(templates.listItems.custom())
+							listUL.append(templates.listItems.processCustom())
 							break;
 						default:
 							return []
 					}
 
-					listUL.on('focus', function(e, obj){
-						opts.eventConfig.list.onObjFocus(e, obj)
-					})
-					listUL.on('blur', function(e, obj){
-						opts.eventConfig.list.onObjBlur(e, obj)
-					})
+					// listUL.on('focus', function(e, obj){
+					// 	opts.eventConfig.list.onObjFocus(e, obj)
+					// })
+					// .on('blur', function(e, obj){
+					// 	opts.eventConfig.list.onObjBlur(e, obj)
+					// })
 	            }
 
 	            return listUL
@@ -393,7 +419,7 @@
 					}
 				},
 				url: function(query){
-
+					//TODO $.ajax
 				}
 			},
 			processList: function(query){
@@ -416,7 +442,7 @@
 
 					if(finalResults !== undefined) {
 						//take the first number (maxItems) of items from the list
-						if(opts.dataConfig.maxItems > 0){
+						if(opts.dataConfig.maxItems !== null && opts.dataConfig.maxItems > 0){
 							finalResults.slice(0, opts.dataConfig.maxItems)
 						}
 					}
@@ -465,7 +491,7 @@
         var autocomplete = {
             cancel: function(obj){
                 var list = obj.find('.' + CONSTANTS.itemList)
-                var input = obj.find('input[type="search"]')
+                var input = obj.find('.' + opts.templates.form.default.inputClass)
 
                 list.hide()
                 input.attr({'aria-expanded': 'false'})
@@ -476,7 +502,7 @@
                 if(list.length) {
                     var current = list.find('.current')
                     var listItems = list.find('ul li')
-                    var input = obj.find('input[type="search"]')
+                    var input = obj.find('.' + opts.templates.form.default.inputClass)
 
                     $(listItems).attr('aria-selected', false)
 
@@ -502,7 +528,7 @@
             },
 			populateValue: function(e, obj){
 				var $listItem = $(e.target)
-				var $input = $(obj).find('input[type="search"]')
+				var $input = $(obj).find('.' + opts.templates.form.default.inputClass)
 
 				$input.val($listItem.text())
 			}
@@ -516,22 +542,30 @@
 			$('.'+opts.initClass).on('click', function(e){
 				var $target = $(e.target)
 
-				if(!$target.hasClass(CONSTANTS.itemList) && !$target.parents().hasClass(CONSTANTS.itemList) && !$target.is('[id*="findItFast-input"]') && !$target.parents().is('[id*="findItFast-input"]')){
+				if(!$target.hasClass(CONSTANTS.itemList) && !$target.parents().hasClass(CONSTANTS.itemList) && !$target.is('[id*="'+opts.templates.form.default.inputName+'"]') && !$target.parents().is('[id*="'+opts.templates.form.default.inputName+'"]')){
 					$('.' + CONSTANTS.itemList).hide()
 				}
 
 				// var $target = $(e.target)
 				// var parentList = $target.parents('.'+CONSTANTS.itemList)
-				// var currentInput = parentList.find('input[type="search"]')
+				// var currentInput = parentList.find('.' + opts.templates.form.default.inputClass)
 				//
 				// if(!$target.hasClass(CONSTANTS.itemList) && !$target.parents().hasClass(CONSTANTS.itemList) && !$target.is(currentInput) && !$target.parents().is(parentList)){
 				// 	$('.'+CONSTANTS.itemList).hide()
 				// }
 			})
 
+
+
 			return findItTargets.each(function(index, ele) {
 				var findItTarget = $(ele)
+
 				findItTarget.append(builders.generateForm(findItTarget, index))
+
+				templates.listItems.attachEvents(findItTarget, opts.templates.listItems.className)
+				templates.form.attachEvents.form(findItTarget)
+				templates.form.attachEvents.input(findItTarget)
+				templates.form.attachEvents.cancel(findItTarget)
 			})
 		}
 
