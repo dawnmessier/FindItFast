@@ -19,20 +19,30 @@
     clip: auto
 }
 
-.autoSearch,
-.autoSearch2 {
-    width: 500px;
+.findItFast-form {
     position: relative;
+    margin-top: 20px;
+}
+
+.findItFast-form button[type="submit"] {
+    padding: 10px;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.findItFast-form label {
+    display: block;
+    font-weight: 700;
 }
 
 .findItFast-list {
     display: none;
-    background-color: #eee;
+    background-color: #fff;
     border-radius: 0 0 5px 5px;
     box-shadow: 5px 5px 5px #666;
     position: absolute;
-    top: 44px;
-    left: 70px;
+    top: 60px;
+    left: 0;
     z-index: 9999;
 }
 
@@ -49,35 +59,40 @@
 
 .findItFast-list li:focus,
 .findItFast-list li:active {
-    
+
 }
 
 .findItFast-list .current {
     background-color: #000;
     color: #fff;
+    text-decoration: none;
 }
 
 .findItFast-list .current:hover,
 .findItFast-list .current:focus,
 .findItFast-list .current:active {
     color: yellow;
+    text-decoration: none;
 }
 
-.findItFast-list ul li {
+.findItFast-list ul li:not(.link-based) {
     cursor: pointer;
     padding: 5px 10px;
 }
 
+.findItFast-list ul li a {
+    text-decoration: none;
+    padding: 5px 10px;
+    display: block;
+}
+
 .findItFast-input-span {
     position: relative;
-    width: 300px;
     display: inline-block;
 }
 
 .findItFast-input-span input {
-    width: 100%;
     height: 44px;
-    position: relative;
     border-radius: 5px;
     padding: 0 10px;
     -webkit-appearance: none; /* needed for search-typed inputs */
@@ -98,10 +113,57 @@
     font-size: 12px;
     line-height: 14px;
     text-align: center;
+    cursor: pointer;
 }
 
 .findItFast-clear:hover,
 .findItFast-clear:focus,
 .findItFast-clear:active {
     color: #000
+}
+
+#search2 button[type="submit"] {
+    padding: 10px;
+    border: 0;
+    background-color: transparent;
+    vertical-align: middle;
+}
+
+#search2 button[type="submit"] img {
+    width: 20px;
+}
+
+#findItFast-list-search1form {
+    top: 44px;
+}
+
+@media (min-width: 768px) {
+    .findItFast-form {
+        margin-right: 20px;
+    }
+    .findItFast-input-span {
+        width: 250px;
+    }
+
+    .findItFast-input-span input {
+        width: 100%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .findItFast-input-span {
+        width: 300px;
+    }
+
+    .findItFast-list {
+        top: 60px;
+        left: 2px;
+    }
+
+    .autoSearch,
+    .autoSearch2 {
+        width: 500px;
+        display: inline-block;
+        vertical-align: top;
+    }
 }

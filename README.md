@@ -5,5 +5,9 @@ A jQuery search autocomplete plugin focused on accessibility
     * Meets accessibility requirements; creates appropriate form input HTML
     * Handles JSON, Arrays and AJAX urls
     * Handles callbacks
-    * Styles/animations are CSS only, which can be replaced
     * Mobile-friendly
+
+**Options
+    * Include ability to redirect items to another page or just populate the form
+    * Include icons
+    * Select maximum number of items shown

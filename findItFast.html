@@ -1,19 +1,124 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="css/findItFast.css"
+        <link href="https://fonts.googleapis.com/css?family=Nunito:400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="css/main.css" />
+        <link rel="stylesheet" href="css/findItFast.css" />
+        <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     </head>
     <body>
-        <p>Multiple search inputs of same type with same configurations, acting independently</p>
-        <div class="autoSearch" style="display: inline-block"></div>
-        <div class="autoSearch" style="display: inline-block"></div>
+        <div class="container">
+            <h1>Find It Fast</h1>
+            <h2>A jQuery search autocomplete plugin focused on accessibility</h2>
+            <h3>Multiple search inputs of same type with same configurations, acting independently</h3>
+            <div class="flexIt">
+                <div class="autoSearch"></div>
+                <div class="autoSearch"></div>
+            </div>
 
-        <p>Individual search inputs of same type with different configurations</p>
-        <div id="search1" class="autoSearch2" style="display: inline-block"></div>
-        <div id="search2" class="autoSearch2" style="display: inline-block"></div>
+            <h3>Individual search inputs of same type with different configurations</h3>
+            <div class="flexIt">
+                <div id="search1" class="autoSearch2"></div>
+                <div id="search2" class="autoSearch2"></div>
+            </div>
+
+            <h3>OPTIONS</h3>
+            <p>OPTIONAL, unless otherwise indicated</p>
+            <ul>
+                <li>dataConfig (string)
+                    <ul>
+                        <li>type (string) - json, array or url (assumes json response)</li>
+                        <li>src (json, array or url of data)</li>
+                        <li>valueName (string - name of 'key' in JSON response to be displayed)</li>
+                        <li>maxItems (number - maximum number of items allowed in autocomplete)</li>
+                        <li>timer (number - ms delay after typing stops before data retrieval)</li>
+                    </ul>
+                </li>
+                <li>initClass (string) - class name attached to HTML tag for reference</li>
+                <li>templates
+                    <ul>
+                        <li>form
+                            <ul>
+                                <li>method (string)</li>
+                                <li>action (string)</li>
+                                <li>name (string) -- <strong>REQUIRED</strong>, unique</li>
+                                <li>label (string)</li>
+                                <li>hideLabelText (boolean)</li>
+                                <li>placeholder (string)</li>
+                                <li>inputName (string) -- use argument name for ajax if selecting url for dataConfig.type</li>
+                                <li>inputClass (string)</li>
+                                <li>clearSearchHtml (string)</li>
+                                <li>clearSearchAriaText (string)</li>
+                                <li>submitType (string) -- 'text' or 'icon' - choosing icon will render 'submitAriaText'</li>
+                                <li>submitHtml (string) text or icon html</li>
+                                <li>submitAriaText (string)</li>
+                            </ul>
+                        </li>
+                        <li>listItems
+                            <ul>
+                                <li>type (string) 'json', 'array'</li>
+                                <li>includeLinks (boolean) - uses anchor tags for listItems</li>
+                                <li>className (string)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>ariaConfig
+                    <ul>
+                        <li>srHiddenClass (string)</li>
+                        <li>includeLiveRegion (boolean) -- should be a live region somewhere on page whether your or this version (NOTE: only renders once if 'true' is selected)</li>
+                        <li>liveMsg -- messages that screen reader reads when search results are resurned
+                            <ul>
+                                <li>none (string)</li>
+                                <li>one: (string)</li>
+                                <li>multiple: (string)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>eventConfig
+                    <ul>
+                        <li>input -- search field
+                            <ul>
+                                <li>onObjClick (callback)</li>
+                                <li>onObjFocus (callback)</li>
+                                <li>onObjBlur (callback)</li>
+                                <li>onObjKeydown (callback)</li>
+                            </ul>
+                        </li>
+                        <li>cancel -- search reset button
+                            <ul>
+                                <li>onObjClick (callback)</li>
+                                <li>onObjFocus (callback)</li>
+                                <li>onObjBlur (callback)</li>
+                            </ul>
+                        </li>
+                        <li>listItems -- each search result
+                            <ul>
+                                <li>onObjClick (callback)</li>
+                                <li>onObjFocus (callback)</li>
+                                <li>onObjBlur (callback)</li>
+                                <li>onObjKeydown (callback)</li>
+                            </ul>
+                        </li>
+                        <li>form -- form actions
+                            <ul>
+                                <li>onObjSubmit (callback)</li>
+                                <li>onObjClick (callback)</li>
+                                <li>onObjFocus (callback)</li>
+                                <li>onObjBlur (callback)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
 
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="data/countries-json.js"></script>
+        <script src="data/countries-json-href.js"></script>
         <script src="data/countries-array.js"></script>
         <script src="js/jquery.finditfast.js"> </script>
         <script>
@@ -25,9 +130,8 @@
                 },
                 templates: {
                     form: {
-                        default: {
-                            label: 'Find It Fast'
-                        }
+                        label: 'Find It Fast',
+                        name: 'multipleSearchForms'
                     },
                     listItems: {
     					type: 'array'
@@ -38,14 +142,20 @@
             $('#search1').findItFast({
                 dataConfig: {
                     type: 'json',
-                    src: countriesJSON,
-                    valueName: 'name'
+                    src: countriesHrefJSON,
+                    valueName: 'name',
+                    valueHref: 'href',
+                    timer: 1000
                 },
                 templates: {
                     form: {
-                        default: {
-                            label: 'Search by country name'
-                        }
+                        label: 'Search by country name',
+                        hideLabelText: true,
+                        placeholder: 'Search by country name',
+                        name: 'search1form'
+                    },
+                    listItems: {
+    					includeLinks: true
                     }
                 },
                 ariaConfig: {
@@ -61,9 +171,10 @@
                 },
                 templates: {
                     form: {
-                        default: {
-                            label: 'Search by country code'
-                        }
+                        label: 'Search by country code',
+                        name: 'search2form',
+                        submitHtml: '<img src="images/search.svg" />',
+                        submitType: 'icon'
                     }
                 },
                 ariaConfig: {
