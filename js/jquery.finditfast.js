@@ -3,61 +3,60 @@
 
  Generates an accessible form and autocomplete list
 
- Options: OPTIONAL, unless otherwise indicated
+ Configuration: OPTIONAL, unless otherwise indicated
  - defaults
- 	- dataConfig (string)
- 		- type (string) - json, array or url (assumes json response)
- 		- src (json, array or url of data)
- 		- valueName (string - name of 'key' in JSON response to be displayed)
- 		- maxItems (number - maximum number of items allowed in autocomplete)
- 		- timer (number - ms delay after typing stops before data retrieval)
-	- initClass (string - class name attached to HTML tag for reference)
- 	- templates
-	 	-form
-		 	- method (string)
-		 	- action (string)
-		 	- name (string) -- REQUIRED, unique
-	 		- label (string)
-	 		- hideLabelText (boolean)
-	 		- placeholder (string)
-	 		- inputName (string) -- use argument name for ajax if selecting url for dataConfig.type
-		 	- inputClass (string)
-		 	- clearSearchHtml (string)
-		 	- clearSearchAriaText (string)
-		 	- submitType (string) -- 'text' or 'icon' - choosing icon will render 'submitAriaText'
-		 	- submitHtml (string) text or icon html
-		 	- submitAriaText (string)
-	 	- listItems
-		 	- type: (string) 'json', 'array'
-		 	- includeLinks (boolean) - uses <a> tags for listItems
-		 	- className (string)
-	- ariaConfig
-			- srHiddenClass (string)
-			- includeLiveRegion (boolean) -- should be a live region somewhere on page whether your or this version (NOTE: only renders once if 'true' is selected)
-			- liveMsg -- messages that screen reader reads when search results are resurned
-				- none (string)
-				- one (string)
-				- multiple (string)
-	- eventConfig
-			- input -- search field
-				- onObjClick (callback)
-				- onObjFocus (callback)
-				- onObjBlur (callback)
-				- onObjKeydown (callback)
-			- cancel -- search reset button
-				- onObjClick (callback)
-				- onObjFocus (callback)
-				- onObjBlur (callback)
-			- listItems -- each search result
-				- onObjClick (callback)
-				- onObjFocus (callback)
-				- onObjBlur (callback)
-				- onObjKeydown (callback)
-			- form -- form actions
-				- onObjSubmit (callback)
-				- onObjClick (callback)
-				- onObjFocus (callback)
-				- onObjBlur (callback)
+	 - dataConfig
+		 - type (string) -- `json`, `array`, or `url` (`url` assumes json response. Form is serialized and params are passed to ajax url)
+		 - src (string) -- json object, array or url of data
+		 - valueName (string) -- name of 'key' in JSON response to display listItem name
+		 - valueHref (string) -- name of 'key' in JSON response to display listItem href
+		 - maxItems (number) -- maximum number of items allowed to display in autocomplete
+		 - timer (number) -- millisecond delay after typing stops before data retrieval
+	 - initClass (string) -- plugin class name attached to HTML tag for reference
+	 - templates
+		 - form
+			 - method (string)
+			 - action (string)
+			 - name (string) -- REQUIRED, unique
+			 - label (string)
+			 - hideLabelText (boolean)
+			 - placeholder (string)
+			 - inputName (string) -- use argument name for ajax request if selecting `url` for `dataConfig.type`
+			 - inputClass (string)
+			 - clearSearchHtml (string)
+			 - clearSearchAriaText (string)
+			 - submitType (string) -- `text` or `icon`, - choosing icon will render `submitAriaText`
+			 - submitHtml (string) button text or icon html
+			 - submitAriaText (string)
+		 - listItems
+			 - type (string) -- `json`, `array`
+			 - includeLinks (boolean) -- uses `<a>` tags for listItems, provide `dataConfig.valueHref`
+			 - className (string) -- additional class name
+	 - ariaConfig
+		 - srHiddenClass (string)
+		 - includeLiveRegion (boolean) -- should be a live region somewhere on page whether it is your own or this version (NOTE: only renders once if `true` is selected)
+		 - liveMsg -- messages that the screen reader reads when search results are returned
+			 - none (string) -- no results (NOTE: this message also appears in the autocomplete when no results are returned)
+			 - one (string) -- one result
+			 - multiple (string) -- more than one result
+	 - eventConfig (callbacks) -- these are defaulted to plugin functionality, but can be replaced with your own
+		 - input -- search field
+			 - onObjClick
+			 - onObjFocus
+			 - onObjBlur
+			 - onObjKeydown
+		 - cancel -- search reset button
+			 - onObjClick
+			 - onObjFocus
+			 - onObjBlur
+			 - onObjKeydown
+		 - listItems -- each search result
+			 - onObjClick
+			 - onObjFocus
+			 - onObjBlur
+			 - onObjKeydown
+		 - form -- form actions
+			 - onObjSubmit
  */
 (function($) {
 	'use strict';
@@ -83,7 +82,7 @@
 		/*****************************************/
 		var defaults = {
             dataConfig: {
-                type: 'json', /* 'json' object, single 'array', or ajax 'url' - form is serialized and params are passed to ajax url */
+                type: 'json',
                 src: null,
                 valueName: null,
 				valueHref: null,
@@ -95,7 +94,7 @@
 				form: {
 					method: 'get',
 	                action: '',
-	                name: '', /* required, unique */
+	                name: '',
 	                label: 'Search',
 					hideLabelText: false,
 	                placeholder: '',
@@ -103,12 +102,12 @@
 					inputClass: '',
 	                clearSearchHtml: 'X',
 					clearSearchAriaText: 'Clear search',
-					submitType: 'text', /* 'text' or 'icon' - icon will render 'submitAriaText' */
-					submitHtml: 'Submit', /* text or icon html */
+					submitType: 'text',
+					submitHtml: 'Submit',
 					submitAriaText: 'Submit'
 	            },
 				listItems: {
-					type: 'json', /* 'json', 'array' */
+					type: 'json',
 					includeLinks: false,
 					className: 'findItFast-item'
 				}
@@ -160,7 +159,8 @@
 					onObjFocus: function(e, obj){
 						autocomplete.cancel(obj)
 					},
-					onObjBlur: function(e, obj){}
+					onObjBlur: function(e, obj){},
+					onObjKeydown: function(e, obj){}
 				},
 				listItems: {
 					onObjClick: function(e, obj){
@@ -202,9 +202,7 @@
 				form: {
 					onObjSubmit: function(e, obj){
 						e.preventDefault()
-					},
-					onObjFocus: function(e, obj){},
-					onObjBlur: function(e, obj){}
+					}
 				}
 			}
 		}
@@ -212,28 +210,12 @@
 		/*****************************************/
 		/* PRIVATE VARIABLES */
 		/*****************************************/
-
-		var opts = $.extend(true, {}, defaults, options)
-
-		//var tagClassRE = /^[A-Za-z][-_A-Za-z0-9]+$/;
-
-		// validate all options
-		// $.each(opts, function validateOptions(key, val) {
-		// 	if (key === 'wrapper' || key === 'caption') {
-		// 		if (typeof val.tag !== 'string' || val.tag.match(tagClassRE) === null) {
-		// 			opts[key]['tag'] = defaults[key]['tag'];
-		// 		}
-		// 		if (typeof val.class !== 'string' || val.class.match(tagClassRE) === null) {
-		// 			opts[key]['class'] = defaults[key]['class'];
-		// 		}
-		// 	}
-		// });
-
 		var currentId = ''
 		var logging = {
 			missingArgs: 'Missing arguments',
 			noResponse: 'Failed to load response'
 		}
+		var opts = $.extend(true, {}, defaults, options)
 
 		/*****************************************/
 		/* PRIVATE FUNCTIONS */
@@ -241,8 +223,8 @@
 		var delay = (function(){
           var timer = 0;
           return function(callback, ms){
-            clearTimeout (timer);
-            timer = setTimeout(callback, ms);
+            clearTimeout (timer)
+            timer = setTimeout(callback, ms)
           };
         })();
 
@@ -326,50 +308,6 @@
 					}).appendTo(listContainer)
 
 					return form
-				},
-				attachEvents: {
-					form: function(obj) {
-						var formToAttach = obj.find('form')
-
-						formToAttach.on('submit', function(e, obj){
-							opts.eventConfig.form.onObjSubmit(e, obj)
-						})
-						.on('focus', function(e, obj){
-							opts.eventConfig.form.onObjFocus(e, obj)
-						})
-						.on('blur', function(e, obj){
-							opts.eventConfig.form.onObjBlur(e, obj)
-						})
-					},
-					input: function(obj){
-						var inputToAttach = obj.find('.' + CONSTANTS.inputClass)
-
-						inputToAttach.on('keydown', function(e){
-							opts.eventConfig.input.onObjKeydown(e, obj)
-		                })
-		                .on('focus', function(e){
-							opts.eventConfig.input.onObjFocus(e, obj)
-		                })
-						.on('blur', function(e){
-							opts.eventConfig.input.onObjBlur(e, obj)
-		                })
-						.on('click', function(e){
-							opts.eventConfig.input.onObjClick(e, obj)
-		                })
-					},
-					cancel: function(obj){
-						var cancelToAttach = obj.find('.' + CONSTANTS.cancelClass)
-
-						cancelToAttach.on('click', function(e){
-							opts.eventConfig.cancel.onObjClick(e, obj)
-		                })
-						.on('focus', function(e){
-		                    opts.eventConfig.cancel.onObjFocus(e, obj)
-		                })
-						.on('blur', function(e){
-		                    opts.eventConfig.cancel.onObjBlur(e, obj)
-		                })
-					}
 				}
 			},
 			listItems: {
@@ -380,22 +318,6 @@
 					links: function(){
 						return '<li class="link-based"><a href="{2}" id="'+ opts.templates.listItems.className +'{1}" class="'+ opts.templates.listItems.className +'" role="option" aria-selected="false">{0}</a></li>'
 					}
-				},
-				attachEvents: function(obj, className){
-					var classToAttach = '.' + className
-
-					obj.on('click', classToAttach, function(e){
-						opts.eventConfig.listItems.onObjClick(e, obj)
-					})
-					.on('focus', classToAttach, function(e){
-						opts.eventConfig.listItems.onObjFocus(e, obj)
-					})
-					.on('blur', classToAttach, function(e){
-						opts.eventConfig.listItems.onObjBlur(e, obj)
-					})
-					.on('keydown', classToAttach, function(e){
-						opts.eventConfig.listItems.onObjKeydown(e, obj)
-					})
 				},
 				processArray: function(list, obj){
 					var finalList = []
@@ -466,6 +388,69 @@
 			clearListItems: function(obj){
 				var listContainer = obj.find('.' + CONSTANTS.itemList)
 				listContainer.find('li').remove()
+			},
+			attachEvents: {
+				form: function(obj) {
+					var formToAttach = obj.find('form')
+
+					formToAttach.on('submit', function(e, obj){
+						opts.eventConfig.form.onObjSubmit(e, obj)
+					})
+					.on('focus', function(e, obj){
+						opts.eventConfig.form.onObjFocus(e, obj)
+					})
+					.on('blur', function(e, obj){
+						opts.eventConfig.form.onObjBlur(e, obj)
+					})
+				},
+				input: function(obj){
+					var inputToAttach = obj.find('.' + CONSTANTS.inputClass)
+
+					inputToAttach.on('keydown', function(e){
+						opts.eventConfig.input.onObjKeydown(e, obj)
+					})
+					.on('focus', function(e){
+						opts.eventConfig.input.onObjFocus(e, obj)
+					})
+					.on('blur', function(e){
+						opts.eventConfig.input.onObjBlur(e, obj)
+					})
+					.on('click', function(e){
+						opts.eventConfig.input.onObjClick(e, obj)
+					})
+				},
+				cancel: function(obj){
+					var cancelToAttach = obj.find('.' + CONSTANTS.cancelClass)
+
+					cancelToAttach.on('click', function(e){
+						opts.eventConfig.cancel.onObjClick(e, obj)
+					})
+					.on('focus', function(e){
+						opts.eventConfig.cancel.onObjFocus(e, obj)
+					})
+					.on('blur', function(e){
+						opts.eventConfig.cancel.onObjBlur(e, obj)
+					})
+					.on('keydown', function(e){
+						opts.eventConfig.cancel.onObjKeydown(e, obj)
+					})
+				},
+				listItems: function(obj, className){
+					var classToAttach = '.' + className
+
+					obj.on('click', classToAttach, function(e){
+						opts.eventConfig.listItems.onObjClick(e, obj)
+					})
+					.on('focus', classToAttach, function(e){
+						opts.eventConfig.listItems.onObjFocus(e, obj)
+					})
+					.on('blur', classToAttach, function(e){
+						opts.eventConfig.listItems.onObjBlur(e, obj)
+					})
+					.on('keydown', classToAttach, function(e){
+						opts.eventConfig.listItems.onObjKeydown(e, obj)
+					})
+				}
 			}
 		}
 
@@ -636,14 +621,6 @@
 				if(!$target.hasClass(CONSTANTS.itemList) && !$target.parents().hasClass(CONSTANTS.itemList) && !$target.is('[id*="'+opts.templates.form.inputName+'"]') && !$target.parents().is('[id*="'+opts.templates.form.inputName+'"]')){
 					$('.' + CONSTANTS.itemList).fadeOut()
 				}
-
-				// var $target = $(e.target)
-				// var parentList = $target.parents('.'+CONSTANTS.itemList)
-				// var currentInput = parentList.find('.' + CONSTANTS.inputClass)
-				//
-				// if(!$target.hasClass(CONSTANTS.itemList) && !$target.parents().hasClass(CONSTANTS.itemList) && !$target.is(currentInput) && !$target.parents().is(parentList)){
-				// 	$('.'+CONSTANTS.itemList).fadeOut()
-				// }
 			})
 
 
@@ -661,10 +638,10 @@
 
 				findItTarget.append(builders.generateForm(findItTarget, identifier))
 
-				templates.listItems.attachEvents(findItTarget, opts.templates.listItems.className)
-				templates.form.attachEvents.form(findItTarget)
-				templates.form.attachEvents.input(findItTarget)
-				templates.form.attachEvents.cancel(findItTarget)
+				builders.attachEvents.listItems(findItTarget, opts.templates.listItems.className)
+				builders.attachEvents.form(findItTarget)
+				builders.attachEvents.input(findItTarget)
+				builders.attachEvents.cancel(findItTarget)
 			})
 		}
 

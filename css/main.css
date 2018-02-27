@@ -4,14 +4,13 @@
     box-sizing: border-box
 }
 
-html {
-    font-size: 10px;
+/* html {
     background-color: #eee;
-}
+} */
 
 body {
     font-family: 'Open Sans',Helvetica,Arial,sans-serif;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.4em;
     margin-top: 0;
 }
@@ -30,7 +29,7 @@ body {
     flex-direction: column;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
     line-height: 1.4em;
 }
 
@@ -56,10 +55,10 @@ h1:before {
     box-shadow: 0 0 5px rgba(0,0,0,.5)
 }
 
-h3 {
+h3, h4 {
     margin-top: 20px;
     margin-bottom: 0;
-    color: #444;
+    color: #666;
 }
 
 @media (min-width: 768px) {

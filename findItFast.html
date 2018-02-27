@@ -11,56 +11,71 @@
     <body>
         <div class="container">
             <h1>Find It Fast</h1>
-            <h2>A jQuery search autocomplete plugin focused on accessibility</h2>
-            <h3>Multiple search inputs of same type with same configurations, acting independently</h3>
+            <h2>A jQuery Search Autocomplete Plugin focused on WAI-ARIA (Accessibility)</h2>
+            <p>Accessibility for the impaired is often overlooked when building a website. It is a large subject to learn, and can be time-consuming to implement. This plugin is designed to cut down on that effort by providing a search autocomplete (form + list) built with all the necessary ARIA HTML.</p>
+            <p><a href="https://github.com/dawnmessier/FindItFast" target="_blank">Find it fast</a> on GitHub</p>
+            <p>For more information on building accessibile websites, refer to these sites:</>
+                <ul>
+                    <li><a href="https://www.w3.org/WAI/gettingstarted/" target="_blank">Web Accessibility Initiative (WAI)</a></li>
+                    <li><a href="https://webaim.org/techniques/aria/" target="_blank">WebAIM</a></li>
+                </ul>
+            <h3>Features</h3>
+            <ul>
+                <li>Meets WAI-ARIA requirements; built-in necessary form input HTML</li>
+                <li>Handles JSON objects, arrays and AJAX urls</li>
+                <li>Optionally customize callbacks</li>
+                <li>Mobile-friendly</li>
+            </ul>
+            <h4>Multiple search inputs generated from the same className selector, acting independently</h4>
             <div class="flexIt">
                 <div class="autoSearch"></div>
                 <div class="autoSearch"></div>
             </div>
 
-            <h3>Individual search inputs of same type with different configurations</h3>
+            <h4>Individual search inputs generated from different ID selectors</h4>
             <div class="flexIt">
                 <div id="search1" class="autoSearch2"></div>
                 <div id="search2" class="autoSearch2"></div>
             </div>
 
-            <h3>OPTIONS</h3>
+            <h3>CONFIGURATION</h3>
             <p>OPTIONAL, unless otherwise indicated</p>
             <ul>
-                <li>dataConfig (string)
+                <li>dataConfig
                     <ul>
-                        <li>type (string) - json, array or url (assumes json response)</li>
-                        <li>src (json, array or url of data)</li>
-                        <li>valueName (string - name of 'key' in JSON response to be displayed)</li>
-                        <li>maxItems (number - maximum number of items allowed in autocomplete)</li>
-                        <li>timer (number - ms delay after typing stops before data retrieval)</li>
+                        <li>type (string) -- `json`, `array`, or `url` (`url` assumes json response. Form is serialized and params are passed to ajax url)</li>
+                        <li>src (string) -- json object, array or url of data</li>
+                        <li>valueName (string) -- name of 'key' in JSON response to display listItem name</li>
+                        <li>valueHref (string) -- name of 'key' in JSON response to display listItem href</li>
+                        <li>maxItems (number) -- maximum number of items allowed to display in autocomplete</li>
+                        <li>timer (number) -- millisecond delay after typing stops before data retrieval</li>
                     </ul>
                 </li>
-                <li>initClass (string) - class name attached to HTML tag for reference</li>
+                <li>initClass (string) -- plugin class name attached to HTML tag for reference</li>
                 <li>templates
                     <ul>
                         <li>form
                             <ul>
                                 <li>method (string)</li>
                                 <li>action (string)</li>
-                                <li>name (string) -- <strong>REQUIRED</strong>, unique</li>
+                                <li><strong>name (string) -- REQUIRED, unique</strong></li>
                                 <li>label (string)</li>
                                 <li>hideLabelText (boolean)</li>
                                 <li>placeholder (string)</li>
-                                <li>inputName (string) -- use argument name for ajax if selecting url for dataConfig.type</li>
+                                <li>inputName (string) -- use argument name for ajax request if selecting `url` for `dataConfig.type`</li>
                                 <li>inputClass (string)</li>
                                 <li>clearSearchHtml (string)</li>
                                 <li>clearSearchAriaText (string)</li>
-                                <li>submitType (string) -- 'text' or 'icon' - choosing icon will render 'submitAriaText'</li>
-                                <li>submitHtml (string) text or icon html</li>
+                                <li>submitType (string) -- `text` or `icon`, - choosing icon will render `submitAriaText`</li>
+                                <li>submitHtml (string) button text or icon html</li>
                                 <li>submitAriaText (string)</li>
                             </ul>
                         </li>
                         <li>listItems
                             <ul>
-                                <li>type (string) 'json', 'array'</li>
-                                <li>includeLinks (boolean) - uses anchor tags for listItems</li>
-                                <li>className (string)</li>
+                                <li>type (string) -- `json`, `array`</li>
+                                <li>includeLinks (boolean) -- uses `<a>` tags for listItems, provide `dataConfig.valueHref`</li>
+                                <li>className (string) -- additional class name</li>
                             </ul>
                         </li>
                     </ul>
@@ -68,47 +83,45 @@
                 <li>ariaConfig
                     <ul>
                         <li>srHiddenClass (string)</li>
-                        <li>includeLiveRegion (boolean) -- should be a live region somewhere on page whether your or this version (NOTE: only renders once if 'true' is selected)</li>
-                        <li>liveMsg -- messages that screen reader reads when search results are resurned
+                        <li>includeLiveRegion (boolean) -- should be a live region somewhere on page whether it is your own or this version (NOTE: only renders once if `true` is selected)</li>
+                        <li>liveMsg -- messages that the screen reader reads when search results are returned
                             <ul>
-                                <li>none (string)</li>
-                                <li>one: (string)</li>
-                                <li>multiple: (string)</li>
+                                <li>none (string) -- no results (NOTE: this message also appears in the autocomplete when no results are returned)</li>
+                                <li>one (string) -- one result</li>
+                                <li>multiple (string) -- more than one result</li>
                             </ul>
                         </li>
                     </ul>
                 </li>
-                <li>eventConfig
+                <li>eventConfig (callbacks) -- these are defaulted to plugin functionality, but can be replaced with your own
                     <ul>
                         <li>input -- search field
                             <ul>
-                                <li>onObjClick (callback)</li>
-                                <li>onObjFocus (callback)</li>
-                                <li>onObjBlur (callback)</li>
-                                <li>onObjKeydown (callback)</li>
+                                <li>onObjClick</li>
+                                <li>onObjFocus</li>
+                                <li>onObjBlur</li>
+                                <li>onObjKeydown</li>
                             </ul>
                         </li>
                         <li>cancel -- search reset button
                             <ul>
-                                <li>onObjClick (callback)</li>
-                                <li>onObjFocus (callback)</li>
-                                <li>onObjBlur (callback)</li>
+                                <li>onObjClick</li>
+                                <li>onObjFocus</li>
+                                <li>onObjBlur</li>
+                                <li>onObjKeydown</li>
                             </ul>
                         </li>
                         <li>listItems -- each search result
                             <ul>
-                                <li>onObjClick (callback)</li>
-                                <li>onObjFocus (callback)</li>
-                                <li>onObjBlur (callback)</li>
-                                <li>onObjKeydown (callback)</li>
+                                <li>onObjClick</li>
+                                <li>onObjFocus</li>
+                                <li>onObjBlur</li>
+                                <li>onObjKeydown</li>
                             </ul>
                         </li>
                         <li>form -- form actions
                             <ul>
-                                <li>onObjSubmit (callback)</li>
-                                <li>onObjClick (callback)</li>
-                                <li>onObjFocus (callback)</li>
-                                <li>onObjBlur (callback)</li>
+                                <li>onObjSubmit</li>
                             </ul>
                         </li>
                     </ul>
