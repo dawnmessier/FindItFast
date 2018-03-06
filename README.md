@@ -1,13 +1,13 @@
 # Find It Fast
 A jQuery Search Autocomplete Plugin focused on WAI-ARIA (Accessibility)
 
-##Features
+## Features
 - Meets WAI-ARIA requirements; built-in necessary form input HTML
 - Handles JSON objects, arrays and AJAX urls
 - Optionally customize callbacks
 - Mobile-friendly
 
-##Configuration
+## Configuration
 OPTIONAL, unless otherwise indicated
 - dataConfig
     - type (string) -- `json`, `array`, or `url` (`url` assumes json response. Form is serialized and params are passed to ajax url)
