@@ -8,8 +8,8 @@
 	 - dataConfig
 		 - type (string) -- `json`, `array`, or `url` (`url` assumes json response. Form is serialized and params are passed to ajax url)
 		 - src (string) -- json object, array or url of data
-		 - valueName (string) -- name of 'key' in JSON response to display listItem name
-		 - valueHref (string) -- name of 'key' in JSON response to display listItem href
+		 - key (string) -- name of 'key' in JSON response to display listItem name
+		 - href (string) -- name of 'key' in JSON response to display listItem href
 		 - maxItems (number) -- maximum number of items allowed to display in autocomplete
 		 - timer (number) -- millisecond delay after typing stops before data retrieval
 	 - initClass (string) -- plugin class name attached to HTML tag for reference
@@ -30,7 +30,7 @@
 			 - submitAriaText (string)
 		 - listItems
 			 - type (string) -- `json`, `array`
-			 - includeLinks (boolean) -- uses `<a>` tags for listItems, provide `dataConfig.valueHref`
+			 - includeLinks (boolean) -- uses `<a>` tags for listItems, provide `dataConfig.href`
 			 - className (string) -- additional class name
 	 - ariaConfig
 		 - srHiddenClass (string)
@@ -84,8 +84,8 @@
             dataConfig: {
                 type: 'json',
                 src: null,
-                valueName: null,
-				valueHref: null,
+                key: null,
+				href: null,
 				maxItems: null,
 	            timer: 500
             },
@@ -146,7 +146,11 @@
 	                            return autocomplete.cancel(obj)
 	                        default:
 	                            delay(function(){
-								  builders.generateListContainer(dataMethods.processList(e.target.value, obj), obj)
+									if(opts.dataConfig.type === 'url'){
+										dataMethods.getData.url(e.target.value, obj)
+									} else {
+										builders.generateListContainer(dataMethods.processList(e.target.value, obj), obj)
+									}
 							  }, opts.dataConfig.timer)
                         }
 					}
@@ -335,9 +339,9 @@
 						var listLI
 
 						if(opts.templates.listItems.includeLinks) {
-							listLI = $(String.format(templates.listItems.type.links(), value[opts.dataConfig.valueName], key, value[opts.dataConfig.valueHref]))
+							listLI = $(String.format(templates.listItems.type.links(), value[opts.dataConfig.key], key, value[opts.dataConfig.href]))
 						} else {
-							listLI = $(String.format(templates.listItems.type.list(), value[opts.dataConfig.valueName], key))
+							listLI = $(String.format(templates.listItems.type.list(), value[opts.dataConfig.key], key))
 						}
 
 						finalList.push(listLI)
@@ -459,7 +463,7 @@
 				json: function(query){
 		             if(query !== ''){
 				 	 	var data = opts.dataConfig.src
-						var dataValue = opts.dataConfig.valueName
+						var dataValue = opts.dataConfig.key
 
 						 return data.filter(function(item) {
 		                     return item[dataValue].toLowerCase().indexOf(query.toLowerCase()) > -1
@@ -484,7 +488,7 @@
 						type: 'get'
 					})
 					.done(function(data) {
-						return data
+						builders.generateListContainer(data, obj)
 					})
 					.fail(function() {
 						console.log(logging.noResponse)
@@ -499,9 +503,6 @@
 					var finalResults
 
 					switch(opts.dataConfig.type){
-					   case 'url':
-						   finalResults = dataMethods.getData.url(query, obj)
-						   break;
 					   case 'array':
 						   finalResults = dataMethods.getData.array(query, obj)
 						   break;
@@ -518,6 +519,8 @@
 							finalResults.slice(0, opts.dataConfig.maxItems)
 						}
 					}
+
+					console.log(finalResults);
 
 					return finalResults
 

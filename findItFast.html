@@ -13,7 +13,7 @@
             <h1>Find It Fast</h1>
             <h2>A jQuery Search Autocomplete Plugin focused on WAI-ARIA (Accessibility)</h2>
             <p>Accessibility for the impaired is often overlooked when building a website. It is a large subject to learn, and can be time-consuming to implement. This plugin is designed to cut down on that effort by providing a search autocomplete (form + list) built with all the necessary ARIA HTML.</p>
-            <p><a href="https://github.com/dawnmessier/FindItFast" target="_blank">Find it fast</a> on GitHub</p>
+            <p><a href="https://dawnmessier.github.io/FindItFast/" target="_blank">Find it fast</a> on GitHub</p>
             <p>For more information on building accessibile websites, refer to these sites:</>
                 <ul>
                     <li><a href="https://www.w3.org/WAI/gettingstarted/" target="_blank">Web Accessibility Initiative (WAI)</a></li>
@@ -45,8 +45,8 @@
                     <ul>
                         <li>type (string) -- `json`, `array`, or `url` (`url` assumes json response. Form is serialized and params are passed to ajax url)</li>
                         <li>src (string) -- json object, array or url of data</li>
-                        <li>valueName (string) -- name of 'key' in JSON response to display listItem name</li>
-                        <li>valueHref (string) -- name of 'key' in JSON response to display listItem href</li>
+                        <li>key (string) -- name of 'key' in JSON response to display listItem name</li>
+                        <li>href (string) -- name of 'key' in JSON response to display listItem href</li>
                         <li>maxItems (number) -- maximum number of items allowed to display in autocomplete</li>
                         <li>timer (number) -- millisecond delay after typing stops before data retrieval</li>
                     </ul>
@@ -74,7 +74,7 @@
                         <li>listItems
                             <ul>
                                 <li>type (string) -- `json`, `array`</li>
-                                <li>includeLinks (boolean) -- uses `<a>` tags for listItems, provide `dataConfig.valueHref`</li>
+                                <li>includeLinks (boolean) -- uses `<a>` tags for listItems, provide `dataConfig.href`</li>
                                 <li>className (string) -- additional class name</li>
                             </ul>
                         </li>
@@ -133,7 +133,7 @@
         <script src="data/countries-json.js"></script>
         <script src="data/countries-json-href.js"></script>
         <script src="data/countries-array.js"></script>
-        <script src="js/jquery.finditfast.js"> </script>
+        <script src="dist/jquery.finditfast.min.js"> </script>
         <script>
             $('.autoSearch').findItFast({
                 dataConfig: {
@@ -156,8 +156,8 @@
                 dataConfig: {
                     type: 'json',
                     src: countriesHrefJSON,
-                    valueName: 'name',
-                    valueHref: 'href',
+                    key: 'name',
+                    href: 'href',
                     timer: 1000
                 },
                 templates: {
@@ -179,7 +179,7 @@
                 dataConfig: {
                     type: 'json',
                     src: countriesJSON,
-                    valueName: 'code',
+                    key: 'code',
                     maxItems: 5
                 },
                 templates: {
