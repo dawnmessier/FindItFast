@@ -3,30 +3,35 @@
     <head>
         <link href="https://fonts.googleapis.com/css?family=Nunito:400,400i,700,700i" rel="stylesheet">
         <link rel="stylesheet" href="css/main.css" />
-        <link rel="stylesheet" href="css/findItFast.css" />
+        <link rel="stylesheet" href="dist/jquery.findItFast.min.css" />
         <meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     </head>
     <body>
         <div class="container">
-            <h1>Find It Fast</h1>
-            <h2>A jQuery Search Autocomplete Plugin focused on WAI-ARIA (Accessibility)</h2>
-            <p>Accessibility for the impaired is often overlooked when building a website. It is a large subject to learn, and can be time-consuming to implement. This plugin is designed to cut down on that effort by providing a search autocomplete (form + list) built with all the necessary ARIA HTML.</p>
-            <p><a href="https://dawnmessier.github.io/FindItFast/" target="_blank">Find it fast</a> on GitHub</p>
-            <p>For more information on building accessibile websites, refer to these sites:</>
+            <header>
+                <div class="flexIt">
+                    <div><h1>Find It Fast</h1></div>
+                    <div><a href="https://dawnmessier.github.io/FindItFast/">Find it fast on GitHub</a></div>
+                </div>
+            </header>
+            <h2>A jQuery search autocomplete plugin with built-in WAI-ARIA</h2>
+            <p>Accessibility for the impaired is often overlooked when building a website. It is a lengthy subject to learn and implement. This plugin is designed to cut down on that effort by providing a search autocomplete (form + list) built with necessary WAI-ARIA HTML. Colors are also chosen for those with color-blindness.</p>
+            <p>For more information on building accessible websites, refer to these sites:</>
                 <ul>
                     <li><a href="https://www.w3.org/WAI/gettingstarted/" target="_blank">Web Accessibility Initiative (WAI)</a></li>
                     <li><a href="https://webaim.org/techniques/aria/" target="_blank">WebAIM</a></li>
                 </ul>
             <h3>Features</h3>
             <ul>
-                <li>Meets WAI-ARIA requirements; built-in necessary form input HTML</li>
+                <li>Meets WAI-ARIA requirements; built-in form input HTML</li>
                 <li>Handles JSON objects, arrays and AJAX urls</li>
                 <li>Optionally customize callbacks</li>
                 <li>Mobile-friendly</li>
             </ul>
             <h4>Multiple search inputs generated from the same className selector, acting independently</h4>
+            <p class="clear-margins">Example: Use the same search setup in both header and footer</p>
             <div class="flexIt">
                 <div class="autoSearch"></div>
                 <div class="autoSearch"></div>
@@ -58,7 +63,7 @@
                             <ul>
                                 <li>method (string)</li>
                                 <li>action (string)</li>
-                                <li><strong>name (string) -- REQUIRED, unique</strong></li>
+                                <li><strong>name (string) -- REQUIRED, unique</strong>  (NOTE: if plugin is initialized on multiple elements of same classname, unique names for each will automatically be generated)</li>
                                 <li>label (string)</li>
                                 <li>hideLabelText (boolean)</li>
                                 <li>placeholder (string)</li>
@@ -66,6 +71,8 @@
                                 <li>inputClass (string)</li>
                                 <li>clearSearchHtml (string)</li>
                                 <li>clearSearchAriaText (string)</li>
+                                <li>includeSubmit (boolean) -- include a search button if the search can also redirect to a search results page. This will add a submit button with an onsubmit event (customized in eventConfig.form.onObjSubmit) and a form action (provide action in templates.form.action)</li>
+                   			    <li>action (string)</li>
                                 <li>submitType (string) -- `text` or `icon`, - choosing icon will render `submitAriaText`</li>
                                 <li>submitHtml (string) button text or icon html</li>
                                 <li>submitAriaText (string)</li>
@@ -74,7 +81,7 @@
                         <li>listItems
                             <ul>
                                 <li>type (string) -- `json`, `array`</li>
-                                <li>includeLinks (boolean) -- uses `<a>` tags for listItems, provide `dataConfig.href`</li>
+                                <li>includeLinks (boolean) -- uses anchor tags for listItems, provide `dataConfig.href`</li>
                                 <li>className (string) -- additional class name</li>
                             </ul>
                         </li>
@@ -165,7 +172,9 @@
                         label: 'Search by country name',
                         hideLabelText: true,
                         placeholder: 'Search by country name',
-                        name: 'search1form'
+                        name: 'search1form',
+                        includeSubmit: true,
+                        action: 'https://www.google.com'
                     },
                     listItems: {
     					includeLinks: true
@@ -187,7 +196,9 @@
                         label: 'Search by country code',
                         name: 'search2form',
                         submitHtml: '<img src="images/search.svg" />',
-                        submitType: 'icon'
+                        submitType: 'icon',
+                        includeSubmit: true,
+                        action: 'https://www.google.com'
                     }
                 },
                 ariaConfig: {

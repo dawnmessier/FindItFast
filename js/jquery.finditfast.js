@@ -1,5 +1,7 @@
 /**
- Find-It-Fast Autocomplete Search with Accessibility
+  * Find-It-Fast Autocomplete Search with built-in WAI-ARIA, version 1.0.X
+  * (c) 2018 Dawn Messier
+  * Licensed under the MIT License
 
  Generates an accessible form and autocomplete list
 
@@ -17,7 +19,7 @@
 		 - form
 			 - method (string)
 			 - action (string)
-			 - name (string) -- REQUIRED, unique
+			 - name (string) -- REQUIRED, unique (NOTE: if plugin is initialized on multiple elements of same classname, unique names for each will automatically be generated)
 			 - label (string)
 			 - hideLabelText (boolean)
 			 - placeholder (string)
@@ -25,6 +27,8 @@
 			 - inputClass (string)
 			 - clearSearchHtml (string)
 			 - clearSearchAriaText (string)
+			 - includeSubmit (boolean) -- include a search button if the search can also redirect to a search results page. This will add a submit button with an onsubmit event (customized in eventConfig.form.onObjSubmit) and a form action (provide action in templates.form.action)
+			 - action (string)
 			 - submitType (string) -- `text` or `icon`, - choosing icon will render `submitAriaText`
 			 - submitHtml (string) button text or icon html
 			 - submitAriaText (string)
@@ -100,8 +104,10 @@
 	                placeholder: '',
 	                inputName: 'q',
 					inputClass: '',
-	                clearSearchHtml: 'X',
+	                clearSearchHtml: '<span aria-hidden="true">X</span>',
 					clearSearchAriaText: 'Clear search',
+					includeSubmit: false,
+					action: '',
 					submitType: 'text',
 					submitHtml: 'Submit',
 					submitAriaText: 'Submit'
@@ -125,8 +131,11 @@
 				input: {
 					onObjClick: function(e, obj){},
 					onObjFocus: function(e, obj){
-						autocomplete.closeAllAutocompletes()
 						var list = obj.find('.' + CONSTANTS.itemList)
+
+						if(!list.is(':visible')){
+							autocomplete.closeAllAutocompletes()
+						}
 
 	                    if (list.length > 0) {
 	                        list.fadeIn('fast')
@@ -141,7 +150,8 @@
 	                            return autocomplete.cancel(obj)
 	                        case keyCodes.UP:
 	                        case keyCodes.DOWN:
-	                            return autocomplete.changeSelection(obj, e.which === keyCodes.UP ? -1 : 1)
+								e.preventDefault()
+								return autocomplete.changeSelection(obj, e.which === keyCodes.UP ? -1 : 1)
 	                        case keyCodes.ENTER:
 	                            return autocomplete.cancel(obj)
 	                        default:
@@ -178,6 +188,7 @@
 					},
 					onObjBlur: function(e, obj){},
 					onObjKeydown: function(e, obj){
+						e.preventDefault()
 						var input = obj.find('.' + CONSTANTS.inputClass)
 
 						switch (e.which) {
@@ -204,9 +215,7 @@
 					}
 				},
 				form: {
-					onObjSubmit: function(e, obj){
-						e.preventDefault()
-					}
+					onObjSubmit: function(e, obj){}
 				}
 			}
 		}
@@ -214,12 +223,12 @@
 		/*****************************************/
 		/* PRIVATE VARIABLES */
 		/*****************************************/
-		var currentId = ''
+		var currentId = '';
 		var logging = {
 			missingArgs: 'Missing arguments',
 			noResponse: 'Failed to load response'
 		}
-		var opts = $.extend(true, {}, defaults, options)
+		var opts = $.extend(true, {}, defaults, options);
 
 		/*****************************************/
 		/* PRIVATE FUNCTIONS */
@@ -253,17 +262,21 @@
 						'class': CONSTANTS.formClass,
 		                'action': opts.templates.form.action,
 		                'method': opts.templates.form.method
-		            })
+		            });
+
+					if(opts.templates.form.action !== ''){
+						form.attr('action', opts.templates.form.action);
+					}
 
 					$('<label></label>', {
 						'for': opts.templates.form.inputName + '-' + identifier,
 						'html': opts.templates.form.label,
 						'class': (opts.templates.form.hideLabelText ?  opts.ariaConfig.srHiddenClass : '')
-					}).appendTo(form)
+					}).appendTo(form);
 
 		            var inputSpan = $('<span></span>', {
 						'class': 'findItFast-input-span'
-					}).appendTo(form)
+					}).appendTo(form);
 
 					var input = $('<input />', {
 						'type': 'search',
@@ -277,182 +290,178 @@
 						'aria-expanded': false,
 						'aria-activedescendant': 'false',
 						'placeholder': opts.templates.form.placeholder
-					})
+					});
 
 					if(opts.templates.form.inputClass !== ''){
-						input.addClass(opts.templates.form.inputClass) /* add optional class */
+						input.addClass(opts.templates.form.inputClass); /* add optional class */
 					}
 
-					input.appendTo(inputSpan)
+					input.appendTo(inputSpan);
 
 		            var clearBtn = $('<button></button>', {
 						'type': 'reset',
 						'class': CONSTANTS.cancelClass,
 						'html': opts.templates.form.clearSearchHtml
-					}).appendTo(inputSpan)
+					}).appendTo(inputSpan);
 
 					$('<span></span>', {
 						'class': opts.ariaConfig.srHiddenClass,
 						'html': opts.templates.form.clearSearchAriaText
-					}).appendTo(clearBtn)
+					}).appendTo(clearBtn);
 
-		            $('<button></button>', {
-						'type': 'submit',
-						'html': opts.templates.form.submitHtml + (opts.templates.form.submitType === 'icon' ? '<span class="'+ opts.ariaConfig.srHiddenClass +'">'+ opts.templates.form.submitAriaText +'</span>' : '')
-					}).appendTo(form)
+					if(opts.templates.form.includeSubmit) {
+			            $('<button></button>', {
+							'type': 'submit',
+							'html': opts.templates.form.submitHtml + (opts.templates.form.submitType === 'icon' ? '<span class="'+ opts.ariaConfig.srHiddenClass +'">'+ opts.templates.form.submitAriaText +'</span>' : '')
+						}).appendTo(form);
+					}
 
 		            var listContainer = $('<div></div>', {
 						'id': CONSTANTS.itemList + '-' + identifier,
 						'class': CONSTANTS.itemList
-					}).appendTo(form)
+					}).appendTo(form);
 
 					$('<ul></ul>', {
 						'id': 'ul-' + CONSTANTS.itemList + '-' + identifier,
 						'role': 'listbox'
-					}).appendTo(listContainer)
+					}).appendTo(listContainer);
 
-					return form
+					return form;
 				}
 			},
 			listItems: {
 				type: {
 					list: function(){
-						return '<li id="'+ opts.templates.listItems.className +'{1}" class="'+ opts.templates.listItems.className +'" role="option" aria-selected="false" tabindex="0">{0}</li>'
+						return '<li id="'+ opts.templates.listItems.className +'{1}" class="'+ opts.templates.listItems.className +'" role="option" aria-selected="false" tabindex="0">{0}</li>';
 					},
 					links: function(){
-						return '<li class="link-based"><a href="{2}" id="'+ opts.templates.listItems.className +'{1}" class="'+ opts.templates.listItems.className +'" role="option" aria-selected="false">{0}</a></li>'
+						return '<li class="link-based"><a href="{2}" id="'+ opts.templates.listItems.className +'{1}" class="'+ opts.templates.listItems.className +'" role="option" aria-selected="false">{0}</a></li>';
 					}
 				},
 				processArray: function(list, obj){
 					var finalList = []
 					for(var i=0; i < list.length; i++){
-						var listLI = $(String.format(templates.listItems.type.list(), list[i], i))
+						var listLI = $(String.format(templates.listItems.type.list(), list[i], i));
 
-						finalList.push(listLI)
+						finalList.push(listLI);
 					}
 
-					return finalList
+					return finalList;
 				},
 				processJson: function(list, obj){
-					var finalList = []
+					var finalList = [];
 					$.each(list, function(key, value){
-						var listLI
+						var listLI;
 
 						if(opts.templates.listItems.includeLinks) {
-							listLI = $(String.format(templates.listItems.type.links(), value[opts.dataConfig.key], key, value[opts.dataConfig.href]))
+							listLI = $(String.format(templates.listItems.type.links(), value[opts.dataConfig.key], key, value[opts.dataConfig.href]));
 						} else {
-							listLI = $(String.format(templates.listItems.type.list(), value[opts.dataConfig.key], key))
+							listLI = $(String.format(templates.listItems.type.list(), value[opts.dataConfig.key], key));
 						}
 
-						finalList.push(listLI)
+						finalList.push(listLI);
 					})
 
-					return finalList
+					return finalList;
 				}
 			}
 		}
 
 		var builders = {
 			generateForm: function(obj, identifier){
-				return templates.form.default(obj, identifier)
+				return templates.form.default(obj, identifier);
 			},
 			generateList: function(list, obj){
-				var listUL = obj.find('.' + CONSTANTS.itemList + ' ul')
+				var listUL = obj.find('.' + CONSTANTS.itemList + ' ul');
 
 	            if(list.length === 0) {
-	                listUL.append('<li>'+ opts.ariaConfig.liveMsg.none +'</li>')
+	                listUL.append('<li>'+ opts.ariaConfig.liveMsg.none +'</li>');
 	            } else {
 					switch(opts.templates.listItems.type){
 						case 'json' || 'url':
-							listUL.append(templates.listItems.processJson(list, obj))
+							listUL.append(templates.listItems.processJson(list, obj));
 							break;
 						case 'array':
-							listUL.append(templates.listItems.processArray(list, obj))
+							listUL.append(templates.listItems.processArray(list, obj));
 							break;
 						default:
-							return []
+							return [];
 					}
 	            }
 
-	            return listUL
+	            return listUL;
 			},
 			generateListContainer:  function(list, obj){
-				builders.clearListItems(obj)
+				builders.clearListItems(obj);
 
-				var listContainer = obj.find('.' + CONSTANTS.itemList)
-	            listContainer.hide()
+				var listContainer = obj.find('.' + CONSTANTS.itemList);
+	            listContainer.hide();
 
 	            if(list !== undefined) {
-	                ariaRoles.updateRegion(list)
+	                ariaRoles.updateRegion(list);
 
-	                listContainer.append(builders.generateList(list, obj))
-	                listContainer.fadeIn('fast')
+	                listContainer.append(builders.generateList(list, obj));
+	                listContainer.fadeIn('fast');
 	            }
 			},
 			clearListItems: function(obj){
-				var listContainer = obj.find('.' + CONSTANTS.itemList)
-				listContainer.find('li').remove()
+				var listContainer = obj.find('.' + CONSTANTS.itemList);
+				listContainer.find('li').remove();
 			},
 			attachEvents: {
 				form: function(obj) {
-					var formToAttach = obj.find('form')
+					var formToAttach = obj.find('form');
 
 					formToAttach.on('submit', function(e, obj){
-						opts.eventConfig.form.onObjSubmit(e, obj)
-					})
-					.on('focus', function(e, obj){
-						opts.eventConfig.form.onObjFocus(e, obj)
-					})
-					.on('blur', function(e, obj){
-						opts.eventConfig.form.onObjBlur(e, obj)
+						opts.eventConfig.form.onObjSubmit(e, obj);
 					})
 				},
 				input: function(obj){
-					var inputToAttach = obj.find('.' + CONSTANTS.inputClass)
+					var inputToAttach = obj.find('.' + CONSTANTS.inputClass);
 
 					inputToAttach.on('keydown', function(e){
-						opts.eventConfig.input.onObjKeydown(e, obj)
+						opts.eventConfig.input.onObjKeydown(e, obj);
 					})
 					.on('focus', function(e){
-						opts.eventConfig.input.onObjFocus(e, obj)
+						opts.eventConfig.input.onObjFocus(e, obj);
 					})
 					.on('blur', function(e){
-						opts.eventConfig.input.onObjBlur(e, obj)
+						opts.eventConfig.input.onObjBlur(e, obj);
 					})
 					.on('click', function(e){
-						opts.eventConfig.input.onObjClick(e, obj)
+						opts.eventConfig.input.onObjClick(e, obj);
 					})
 				},
 				cancel: function(obj){
-					var cancelToAttach = obj.find('.' + CONSTANTS.cancelClass)
+					var cancelToAttach = obj.find('.' + CONSTANTS.cancelClass);
 
 					cancelToAttach.on('click', function(e){
-						opts.eventConfig.cancel.onObjClick(e, obj)
+						opts.eventConfig.cancel.onObjClick(e, obj);
 					})
 					.on('focus', function(e){
-						opts.eventConfig.cancel.onObjFocus(e, obj)
+						opts.eventConfig.cancel.onObjFocus(e, obj);
 					})
 					.on('blur', function(e){
-						opts.eventConfig.cancel.onObjBlur(e, obj)
+						opts.eventConfig.cancel.onObjBlur(e, obj);
 					})
 					.on('keydown', function(e){
-						opts.eventConfig.cancel.onObjKeydown(e, obj)
+						opts.eventConfig.cancel.onObjKeydown(e, obj);
 					})
 				},
 				listItems: function(obj, className){
-					var classToAttach = '.' + className
+					var classToAttach = '.' + className;
 
 					obj.on('click', classToAttach, function(e){
-						opts.eventConfig.listItems.onObjClick(e, obj)
+						opts.eventConfig.listItems.onObjClick(e, obj);
 					})
 					.on('focus', classToAttach, function(e){
-						opts.eventConfig.listItems.onObjFocus(e, obj)
+						opts.eventConfig.listItems.onObjFocus(e, obj);
 					})
 					.on('blur', classToAttach, function(e){
-						opts.eventConfig.listItems.onObjBlur(e, obj)
+						opts.eventConfig.listItems.onObjBlur(e, obj);
 					})
 					.on('keydown', classToAttach, function(e){
-						opts.eventConfig.listItems.onObjKeydown(e, obj)
+						opts.eventConfig.listItems.onObjKeydown(e, obj);
 					})
 				}
 			}
@@ -462,25 +471,25 @@
 			getData: {
 				json: function(query){
 		             if(query !== ''){
-				 	 	var data = opts.dataConfig.src
-						var dataValue = opts.dataConfig.key
+				 	 	var data = opts.dataConfig.src;
+						var dataValue = opts.dataConfig.key;
 
 						 return data.filter(function(item) {
-		                     return item[dataValue].toLowerCase().indexOf(query.toLowerCase()) > -1
-		                 })
+		                     return item[dataValue].toLowerCase().indexOf(query.toLowerCase()) > -1;
+		                 });
 		             }
 				},
 				array: function(query){
 					if(query !== ''){
-					   var data = opts.dataConfig.src
+					   var data = opts.dataConfig.src;
 
 						return data.filter(function(item) {
-							return item.toLowerCase().indexOf(query.toLowerCase()) > -1
-						})
+							return item.toLowerCase().indexOf(query.toLowerCase()) > -1;
+						});
 					}
 				},
 				url: function(query, obj){
-					var form = obj.find('form')
+					var form = obj.find('form');
 					$.ajax({
 						url: opts.dataConfig.src,
 						data: form.serialize(),
@@ -488,7 +497,9 @@
 						type: 'get'
 					})
 					.done(function(data) {
-						builders.generateListContainer(data, obj)
+						if(data){
+							builders.generateListContainer(data, obj)
+						}
 					})
 					.fail(function() {
 						console.log(logging.noResponse)
@@ -500,32 +511,30 @@
 			},
 			processList: function(query, obj){
 				if(query.length && opts.dataConfig.src) {
-					var finalResults
+					var finalResults;
 
 					switch(opts.dataConfig.type){
 					   case 'array':
-						   finalResults = dataMethods.getData.array(query, obj)
+						   finalResults = dataMethods.getData.array(query, obj);
 						   break;
 					   case 'json':
-						   finalResults = dataMethods.getData.json(query, obj)
+						   finalResults = dataMethods.getData.json(query, obj);
 						   break;
 					   default:
-						   finalResults = []
+						   finalResults = [];
 				   }
 
 					if(finalResults !== undefined) {
 						//take the first number (maxItems) of items from the list
 						if(opts.dataConfig.maxItems !== null && opts.dataConfig.maxItems > 0){
-							finalResults.slice(0, opts.dataConfig.maxItems)
+							finalResults.slice(0, opts.dataConfig.maxItems);
 						}
 					}
 
-					console.log(finalResults);
-
-					return finalResults
+					return finalResults;
 
 				} else {
-					console.log(logging.missingArgs)
+					console.log(logging.missingArgs);
 				}
 			}
 		}
@@ -538,23 +547,23 @@
 		                'aria-live': 'polite',
 						'class': opts.ariaConfig.srHiddenClass,
 						'html': '<span></span>'
-		            }).prependTo('body')
+		            }).prependTo('body');
 		        }
 			},
 			updateRegion: function(list){
-				var liveArea = $('body').find('#findItFast-live-region span')
+				var liveArea = $('body').find('#findItFast-live-region span');
 
                 if(liveArea !== undefined){
-                    liveArea.text('')
+                    liveArea.text('');
                     switch(list.length) {
                         case 0:
-                          liveArea.text(opts.ariaConfig.liveMsg.none)
+                          liveArea.text(opts.ariaConfig.liveMsg.none);
                           break;
                         case 1:
-                          liveArea.text(opts.ariaConfig.liveMsg.one)
+                          liveArea.text(opts.ariaConfig.liveMsg.one);
                           break;
                         default:
-                          liveArea.text(opts.ariaConfig.liveMsg.multiple)
+                          liveArea.text(opts.ariaConfig.liveMsg.multiple);
                     }
                 }
 			}
@@ -562,92 +571,92 @@
 
         var autocomplete = {
             cancel: function(obj){
-                var list = obj.find('.' + CONSTANTS.itemList)
-                var input = obj.find('.' + CONSTANTS.inputClass)
+                var list = obj.find('.' + CONSTANTS.itemList);
+                var input = obj.find('.' + CONSTANTS.inputClass);
 
                 list.fadeOut()
                 input.attr({'aria-expanded': 'false'})
             },
             changeSelection: function(obj, direction){
-                var list = obj.find('.' + CONSTANTS.itemList)
+                var list = obj.find('.' + CONSTANTS.itemList);
 
                 if(list.length) {
-                    var current = list.find('.current')
-                    var listItems = list.find('ul li')
-                    var input = obj.find('.' + CONSTANTS.inputClass)
+                    var current = list.find('.current');
+                    var listItems = list.find('ul li');
+                    var input = obj.find('.' + CONSTANTS.inputClass);
 
 					if(opts.templates.listItems.includeLinks){
-						listItems = listItems.find('a')
+						listItems = listItems.find('a');
 					}
 
-                    $(listItems).attr('aria-selected', false)
+                    $(listItems).attr('aria-selected', false);
 
-                    input.attr('aria-activedescendant', '')
+                    input.attr('aria-activedescendant', '');
 
                     if(current.length === 0) {
-                        var first = listItems.first()
-                        $(first).addClass("current").attr("aria-selected", true).focus()
-                        input.attr("aria-activedescendant", first.attr('id'))
+                        var first = listItems.first();
+                        $(first).addClass("current").attr("aria-selected", true).focus();
+                        input.attr("aria-activedescendant", first.attr('id'));
                     } else {
-						listItems.removeClass('current')
+						listItems.removeClass('current');
 						if(direction === -1 && listItems.index(current) + 1 === 1) {
-							input.focus()
+							input.focus();
 						} else if(direction === 1 && listItems.index(current) + 1 === listItems.length){
-							listItems.first().focus()
+							input.focus();
 						} else {
-							var next = listItems.eq(listItems.index(current) + direction)
-	                        $(next).addClass("current").attr("aria-selected", true).focus()
-	                        input.attr("aria-activedescendant", next.attr('id'))
+							var next = listItems.eq(listItems.index(current) + direction);
+	                        $(next).addClass("current").attr("aria-selected", true).focus();
+	                        input.attr("aria-activedescendant", next.attr('id'));
 						}
                     }
                 }
             },
 			populateValue: function(e, obj){
-				var $listItem = $(e.target)
-				var $input = $(obj).find('.' + CONSTANTS.inputClass)
+				var $listItem = $(e.target);
+				var $input = $(obj).find('.' + CONSTANTS.inputClass);
 
-				$input.val($listItem.text())
+				$input.val($listItem.text());
 			},
 			closeAllAutocompletes: function(){
-				$('.findItFast-list').fadeOut('fast')
+				$('.findItFast-list').fadeOut('fast');
 			}
         }
 
 		function init(findItTargets){
-			ariaRoles.createRegion()
+			ariaRoles.createRegion();
 
-			$('html').addClass(opts.initClass)
+			$('html').addClass(opts.initClass);
 
 			$('.'+opts.initClass).on('click', function(e){
-				var $target = $(e.target)
+				var $target = $(e.target);
 
 				if(!$target.hasClass(CONSTANTS.itemList) && !$target.parents().hasClass(CONSTANTS.itemList) && !$target.is('[id*="'+opts.templates.form.inputName+'"]') && !$target.parents().is('[id*="'+opts.templates.form.inputName+'"]')){
-					$('.' + CONSTANTS.itemList).fadeOut()
+					$('.' + CONSTANTS.itemList).fadeOut();
 				}
 			})
 
 
 
 			return findItTargets.each(function(index, ele) {
-				var findItTarget = $(ele)
-				var identifier = ''
+				var findItTarget = $(ele);
+				var identifier = '';
 
 				if(currentId === opts.templates.form.name){
-					identifier = index
+					identifier = index;
 				} else {
-					identifier = opts.templates.form.name
-					currentId = opts.templates.form.name
+					identifier = opts.templates.form.name;
+					currentId = opts.templates.form.name;
 				}
 
-				findItTarget.append(builders.generateForm(findItTarget, identifier))
+				findItTarget.append(builders.generateForm(findItTarget, identifier));
 
-				builders.attachEvents.listItems(findItTarget, opts.templates.listItems.className)
-				builders.attachEvents.form(findItTarget)
-				builders.attachEvents.input(findItTarget)
-				builders.attachEvents.cancel(findItTarget)
+				builders.attachEvents.listItems(findItTarget, opts.templates.listItems.className);
+				builders.attachEvents.form(findItTarget);
+				builders.attachEvents.input(findItTarget);
+				builders.attachEvents.cancel(findItTarget);
 			})
 		}
 
-		return init(this)
+		return init(this);
 	}
 })(jQuery);

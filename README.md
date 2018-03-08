@@ -1,11 +1,12 @@
 # Find It Fast
-A jQuery Search Autocomplete Plugin focused on WAI-ARIA (Accessibility)
+A jQuery search autocomplete plugin with built-in WAI-ARIA
 
 ## Features
 - Meets WAI-ARIA requirements; built-in necessary form input HTML
 - Handles JSON objects, arrays and AJAX urls
 - Optionally customize callbacks
 - Mobile-friendly
+- Same configuration can be attached to multiple elements of same class name. Example: Use the same search setup in both header and footer.
 
 ## Configuration
 OPTIONAL, unless otherwise indicated
@@ -21,7 +22,7 @@ OPTIONAL, unless otherwise indicated
     - form
         - method (string)
         - action (string)
-        - **name (string) -- REQUIRED, unique**
+        - **name (string) -- REQUIRED, unique** (NOTE: if plugin is initialized on multiple elements of same classname, unique names for each will automatically be generated)
         - label (string)
         - hideLabelText (boolean)
         - placeholder (string)
@@ -29,6 +30,8 @@ OPTIONAL, unless otherwise indicated
         - inputClass (string)
         - clearSearchHtml (string)
         - clearSearchAriaText (string)
+        - includeSubmit (boolean) -- include a search button if the search can also redirect to a search results page. This will add a submit button with an onsubmit event (customized in eventConfig.form.onObjSubmit) and a form action (provide action in templates.form.action)
+        - action (string)
         - submitType (string) -- `text` or `icon`, - choosing icon will render `submitAriaText`
         - submitHtml (string) button text or icon html
         - submitAriaText (string)
@@ -64,7 +67,8 @@ OPTIONAL, unless otherwise indicated
 
 ### Example Configs for API resource
 
-`$('#search1').findItFast({
+```
+$('#search1').findItFast({
     dataConfig: {
         type: 'url',
         src: '/countries/search?limit=10',
@@ -74,10 +78,7 @@ OPTIONAL, unless otherwise indicated
     },
     templates: {
         form: {
-            label: 'Search by country name',
-            hideLabelText: true,
-            placeholder: 'Search by country name',
-            name: 'search1form',
+            name: 'search1',
             inputName: 'q'
         },
         listItems: {
@@ -94,14 +95,12 @@ $('#search2').findItFast({
     },
     templates: {
         form: {
-            label: 'Search by country code',
-            name: 'search2form',
-            submitHtml: '<img src="images/search.svg" />',
-            submitType: 'icon',
+            name: 'search2',
             inputName: 'q'
         }
     },
     ariaConfig: {
         includeLiveRegion: true
     }
-})`
+})
+```

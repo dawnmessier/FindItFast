@@ -51,27 +51,25 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    color: #333333;
 }
 
-.findItFast-list li:hover {
-    color: blue;
-}
-
+.findItFast-list li:hover,
 .findItFast-list li:focus,
 .findItFast-list li:active {
-
+    color: #0000cc;
 }
 
 .findItFast-list .current {
-    background-color: #000;
-    color: #fff;
+    background-color: #000000;
+    color: #ffffff;
     text-decoration: none;
 }
 
 .findItFast-list .current:hover,
 .findItFast-list .current:focus,
 .findItFast-list .current:active {
-    color: yellow;
+    color: #ffd633;
     text-decoration: none;
 }
 
@@ -84,6 +82,7 @@
     text-decoration: none;
     padding: 5px 10px;
     display: block;
+    color: #333333;
 }
 
 .findItFast-input-span {
@@ -105,10 +104,10 @@
     width: 40px;
     height: 40px;
     padding: 8px;
-    color: #999;
+    color: #999999;
     right: 2px;
     top: 2px;
-    background: #fff;
+    background: #ffffff;
     border: none;
     font-size: 12px;
     line-height: 14px;
@@ -119,18 +118,7 @@
 .findItFast-clear:hover,
 .findItFast-clear:focus,
 .findItFast-clear:active {
-    color: #000
-}
-
-#search2 button[type="submit"] {
-    padding: 10px;
-    border: 0;
-    background-color: transparent;
-    vertical-align: middle;
-}
-
-#search2 button[type="submit"] img {
-    width: 20px;
+    color: #000000;
 }
 
 #findItFast-list-search1form {
@@ -158,12 +146,5 @@
     .findItFast-list {
         top: 60px;
         left: 2px;
-    }
-
-    .autoSearch,
-    .autoSearch2 {
-        width: 500px;
-        display: inline-block;
-        vertical-align: top;
     }
 }
