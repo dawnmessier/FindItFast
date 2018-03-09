@@ -46,6 +46,13 @@
     z-index: 9999;
 }
 
+.findItFast-list.top {
+    top: auto;
+    bottom: 45px;
+    border-radius: 5px 5px 0 0;
+    box-shadow: 5px -5px 5px #666;
+}
+
 .findItFast-list ul,
 .findItFast-list ul li {
     list-style: none;

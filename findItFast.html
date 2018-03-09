@@ -2,8 +2,8 @@
 <html>
     <head>
         <link href="https://fonts.googleapis.com/css?family=Nunito:400,400i,700,700i" rel="stylesheet">
-        <link rel="stylesheet" href="css/main.css" />
         <link rel="stylesheet" href="dist/jquery.findItFast.min.css" />
+        <link rel="stylesheet" href="css/main.css" />
         <meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -30,21 +30,17 @@
                 <li>Optionally customize callbacks</li>
                 <li>Mobile-friendly</li>
             </ul>
-            <h4>Multiple search inputs generated from the same className selector, acting independently</h4>
-            <p class="clear-margins">Example: Use the same search setup in both header and footer</p>
+            <h4>Initialize element with unique ID</h4>
             <div class="flexIt">
-                <div class="autoSearch"></div>
-                <div class="autoSearch"></div>
+                <div id="search3" class="autoSearch"></div>
+                <div id="search4" class="autoSearch"></div>
             </div>
-
-            <h4>Individual search inputs generated from different ID selectors</h4>
             <div class="flexIt">
                 <div id="search1" class="autoSearch2"></div>
                 <div id="search2" class="autoSearch2"></div>
             </div>
 
-            <h3>CONFIGURATION</h3>
-            <p>OPTIONAL, unless otherwise indicated</p>
+            <h3>OPTIONAL CONFIGURATION</h3>
             <ul>
                 <li>dataConfig
                     <ul>
@@ -63,7 +59,7 @@
                             <ul>
                                 <li>method (string)</li>
                                 <li>action (string)</li>
-                                <li><strong>name (string) -- REQUIRED, unique</strong>  (NOTE: if plugin is initialized on multiple elements of same classname, unique names for each will automatically be generated)</li>
+                                <li>name (string)</li>
                                 <li>label (string)</li>
                                 <li>hideLabelText (boolean)</li>
                                 <li>placeholder (string)</li>
@@ -83,6 +79,7 @@
                                 <li>type (string) -- `json`, `array`</li>
                                 <li>includeLinks (boolean) -- uses anchor tags for listItems, provide `dataConfig.href`</li>
                                 <li>className (string) -- additional class name</li>
+                                <li>position (string) -- placement of autocomplete list (`bottom` or `top`)</li>
                             </ul>
                         </li>
                     </ul>
@@ -140,9 +137,9 @@
         <script src="data/countries-json.js"></script>
         <script src="data/countries-json-href.js"></script>
         <script src="data/countries-array.js"></script>
-        <script src="dist/jquery.finditfast.min.js"> </script>
+        <script src="js/jquery.finditfast.js"> </script>
         <script>
-            $('.autoSearch').findItFast({
+            $('#search3').findItFast({
                 dataConfig: {
                     type: 'array',
                     src: countriesARRAY,
@@ -155,6 +152,24 @@
                     },
                     listItems: {
     					type: 'array'
+    				}
+                }
+            })
+
+            $('#search4').findItFast({
+                dataConfig: {
+                    type: 'array',
+                    src: countriesARRAY,
+                    maxItems: 7
+                },
+                templates: {
+                    form: {
+                        label: 'Find It Fast',
+                        name: 'multipleSearchForms'
+                    },
+                    listItems: {
+    					type: 'array',
+                        position: 'top'
     				}
                 }
             })

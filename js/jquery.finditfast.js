@@ -5,7 +5,7 @@
 
  Generates an accessible form and autocomplete list
 
- Configuration: OPTIONAL, unless otherwise indicated
+ Optional Configuration
  - defaults
 	 - dataConfig
 		 - type (string) -- `json`, `array`, or `url` (`url` assumes json response. Form is serialized and params are passed to ajax url)
@@ -19,7 +19,7 @@
 		 - form
 			 - method (string)
 			 - action (string)
-			 - name (string) -- REQUIRED, unique (NOTE: if plugin is initialized on multiple elements of same classname, unique names for each will automatically be generated)
+			 - name (string)
 			 - label (string)
 			 - hideLabelText (boolean)
 			 - placeholder (string)
@@ -36,6 +36,7 @@
 			 - type (string) -- `json`, `array`
 			 - includeLinks (boolean) -- uses `<a>` tags for listItems, provide `dataConfig.href`
 			 - className (string) -- additional class name
+			 - position (string) -- placement of autocomplete list (`bottom` or `top`)
 	 - ariaConfig
 		 - srHiddenClass (string)
 		 - includeLiveRegion (boolean) -- should be a live region somewhere on page whether it is your own or this version (NOTE: only renders once if `true` is selected)
@@ -98,7 +99,7 @@
 				form: {
 					method: 'get',
 	                action: '',
-	                name: '',
+	                name: 'findItFast-form',
 	                label: 'Search',
 					hideLabelText: false,
 	                placeholder: '',
@@ -115,7 +116,8 @@
 				listItems: {
 					type: 'json',
 					includeLinks: false,
-					className: 'findItFast-item'
+					className: 'findItFast-item',
+					position: 'bottom'
 				}
             },
 			ariaConfig: {
@@ -188,7 +190,6 @@
 					},
 					onObjBlur: function(e, obj){},
 					onObjKeydown: function(e, obj){
-						e.preventDefault()
 						var input = obj.find('.' + CONSTANTS.inputClass)
 
 						switch (e.which) {
@@ -197,18 +198,22 @@
 								return autocomplete.cancel(obj)
 							case keyCodes.UP:
 							case keyCodes.DOWN:
-								return autocomplete.changeSelection(obj, e.which === keyCodes.UP ? -1 : 1)
+								e.preventDefault();
+								return autocomplete.changeSelection(obj, e.which === keyCodes.UP ? -1 : 1);
 							case keyCodes.ENTER:
-								if(!opts.templates.listItems.includeLinks) {
-									input.focus()
-									$(this).click()
-									return autocomplete.cancel(obj)
+								if(opts.templates.listItems.includeLinks) {
+									$(this)[0].click();
+									return false;
 								} else {
-									$(this)[0].click()
+									e.preventDefault();
+									input.focus();
+									$(this).click();
+									return autocomplete.cancel(obj);
 								}
 							case keyCodes.TAB:
 								e.preventDefault()
 								input.next().focus()
+								return false;
 							default:
 								return false
 						}
@@ -223,7 +228,6 @@
 		/*****************************************/
 		/* PRIVATE VARIABLES */
 		/*****************************************/
-		var currentId = '';
 		var logging = {
 			missingArgs: 'Missing arguments',
 			noResponse: 'Failed to load response'
@@ -318,7 +322,7 @@
 
 		            var listContainer = $('<div></div>', {
 						'id': CONSTANTS.itemList + '-' + identifier,
-						'class': CONSTANTS.itemList
+						'class': CONSTANTS.itemList + ' ' + opts.templates.listItems.position
 					}).appendTo(form);
 
 					$('<ul></ul>', {
@@ -594,11 +598,17 @@
                     input.attr('aria-activedescendant', '');
 
                     if(current.length === 0) {
-                        var first = listItems.first();
+						var first;
+						if(opts.templates.listItems.position === 'top'){
+							first = listItems.last();
+						} else {
+							first = listItems.first();
+						}
                         $(first).addClass("current").attr("aria-selected", true).focus();
                         input.attr("aria-activedescendant", first.attr('id'));
                     } else {
 						listItems.removeClass('current');
+
 						if(direction === -1 && listItems.index(current) + 1 === 1) {
 							input.focus();
 						} else if(direction === 1 && listItems.index(current) + 1 === listItems.length){
@@ -622,7 +632,7 @@
 			}
         }
 
-		function init(findItTargets){
+		function init(ele){
 			ariaRoles.createRegion();
 
 			$('html').addClass(opts.initClass);
@@ -635,26 +645,17 @@
 				}
 			})
 
+			var findItTarget = $(ele);
+			var identifier = opts.templates.form.name;
 
+			findItTarget.append(builders.generateForm(findItTarget, identifier));
 
-			return findItTargets.each(function(index, ele) {
-				var findItTarget = $(ele);
-				var identifier = '';
+			builders.attachEvents.listItems(findItTarget, opts.templates.listItems.className);
+			builders.attachEvents.form(findItTarget);
+			builders.attachEvents.input(findItTarget);
+			builders.attachEvents.cancel(findItTarget);
 
-				if(currentId === opts.templates.form.name){
-					identifier = index;
-				} else {
-					identifier = opts.templates.form.name;
-					currentId = opts.templates.form.name;
-				}
-
-				findItTarget.append(builders.generateForm(findItTarget, identifier));
-
-				builders.attachEvents.listItems(findItTarget, opts.templates.listItems.className);
-				builders.attachEvents.form(findItTarget);
-				builders.attachEvents.input(findItTarget);
-				builders.attachEvents.cancel(findItTarget);
-			})
+			return findItTarget;
 		}
 
 		return init(this);
