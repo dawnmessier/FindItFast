@@ -56,8 +56,12 @@
 
 .findItFast-list li:hover,
 .findItFast-list li:focus,
-.findItFast-list li:active {
-    color: #0000cc;
+.findItFast-list li:active,
+.findItFast-list ul li a:hover,
+.findItFast-list ul li a:active,
+.findItFast-list ul li a:focus {
+    background-color: #000000;
+    color: #ffd633;
 }
 
 .findItFast-list .current {
